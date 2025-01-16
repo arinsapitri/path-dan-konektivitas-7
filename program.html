@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Graf Konektivitas</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      section {
+        margin-top: 150px;
+        padding: 2rem 7%;
+      }
+      .form-container {
+        background: var(--black);
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+        max-width: 600px;
+        margin: 0 auto 4rem auto;
+      }
+
+      .form-container label {
+        display: block;
+        font-size: 1.6rem;
+        margin-bottom: 0.5rem;
+        color: var(--main-color);
+        font-weight: 700;
+      }
+
+      .form-container input {
+        width: 100%;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        font-size: 1.6rem;
+        color: #333;
+        border-radius: 5px;
+        border: none;
+        outline: none;
+      }
+
+      .form-container button {
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        background-color: var(--main-color);
+        color: #fff;
+        font-size: 1.8rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .form-container button:hover {
+        background: #b89268;
+        letter-spacing: 0.1rem;
+      }
+
+      canvas {
+        display: block;
+        margin: 2rem auto;
+        background: #f4f4f4;
+        border: 2px solid var(--main-color);
+        border-radius: 10px;
+      }
+
+      .footer {
+        text-align: center;
+        font-size: 1.5rem;
+        color: #fff;
+        background: var(--black);
+        padding: 2rem;
+        margin-top: 4rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <a href="#">
+        <img src="Image/logo.png" />
+      </a>
+
+      <nav class="navbar">
+        <a href="index.html">Derajat</a>
+        <a href="index.html">Path</a>
+        <a href="index.html">Konektivitas</a>
+        <a href="video.html">Video Pembelajaran</a>
+        <a href="program.html">Program</a>
+        <a href="quiz.html">Latihan Soal</a>
+      </nav>
+    </header>
+
+    <!-- Section Input Graf -->
+    <section>
+      <h1 class="heading">Buat <span>Graf Konektivitas</span></h1>
+
+      <div class="form-container">
+        <label for="numNodes">Jumlah Node:</label>
+        <input type="number" id="numNodes" placeholder="Contoh: 5" min="1" />
+
+        <label for="connections">Koneksi Node (format: 1-2, 3-4):</label>
+        <input type="text" id="connections" placeholder="Contoh: 1-2, 3-4" />
+
+        <button onclick="generateGraph()">Gambar Graf</button>
+      </div>
+
+      <!-- Canvas untuk menampilkan graf -->
+      <canvas id="graphCanvas" width="800" height="600"></canvas>
+    </section>
+
+    <!-- footer -->
+
+    <section class="footer">
+      <div class="credit">
+        created by <span>Kelompok 7</span> | Path Dan Konektivitas
+      </div>
+    </section>
+
+    <script>
+      const canvas = document.getElementById("graphCanvas");
+      const ctx = canvas.getContext("2d");
+      let nodes = [];
+      let edges = [];
+
+      function generateGraph() {
+        const numNodes = parseInt(document.getElementById("numNodes").value);
+        const connectionsInput = document.getElementById("connections").value;
+
+        if (isNaN(numNodes) || numNodes <= 0) {
+          alert("Masukkan jumlah node yang valid.");
+          return;
+        }
+
+        nodes = [];
+        edges = [];
+        const angleStep = (2 * Math.PI) / numNodes;
+
+        for (let i = 0; i < numNodes; i++) {
+          const x = 400 + 200 * Math.cos(angleStep * i);
+          const y = 300 + 200 * Math.sin(angleStep * i);
+          nodes.push({ id: i + 1, x, y });
+        }
+
+        const connectionPairs = connectionsInput.split(",");
+        connectionPairs.forEach((pair) => {
+          const [node1, node2] = pair
+            .split("-")
+            .map((num) => parseInt(num.trim()));
+          if (
+            !isNaN(node1) &&
+            !isNaN(node2) &&
+            node1 <= numNodes &&
+            node2 <= numNodes
+          ) {
+            edges.push([node1, node2]);
+          }
+        });
+
+        drawGraph();
+      }
+
+      function drawGraph() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        edges.forEach(([n1, n2]) => {
+          const node1 = nodes[n1 - 1];
+          const node2 = nodes[n2 - 1];
+          ctx.beginPath();
+          ctx.moveTo(node1.x, node1.y);
+          ctx.lineTo(node2.x, node2.y);
+          ctx.strokeStyle = "gray";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        });
+
+        nodes.forEach((node) => {
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, 20, 0, 2 * Math.PI);
+          ctx.fillStyle = "skyblue";
+          ctx.fill();
+          ctx.strokeStyle = "#333";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          ctx.fillStyle = "#000";
+          ctx.font = "bold 14px Poppins";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(node.id, node.x, node.y);
+        });
+      }
+    </script>
+  </body>
+</html>
